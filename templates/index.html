@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="utf-8" />
+   <title>Stock Chart.js </title>
+
+   <script src = "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"> </script>
+
+</head>
+<body>
+<h1>Stock chart for {{current_ticker}}</h1>
+
+<!-- Form to select Stock Ticker name -->
+<form action="/">
+<select name="ticker_name">
+    {% for ticker in ticker_names %}
+        {% if ticker == current_ticker %}
+            <option selected value="{{ ticker }}">{{ ticker }}</option> 
+        {% else %} 
+            <option value="{{ ticker }}">{{ ticker }}</option> 
+        {% endif %}
+    {% endfor %}
+</select>
+<input type="submit">
+</form>
+
+
+<!-- Chart -->
+<canvas id="chart" width= "1000" height= "550"></canvas>
+<div class="ct-chart ct-golden-section" id="chart1"></div>
+
+<script>
+var stock_data = {
+labels : [{% for item in labels[window_size_3 - 1:]  %}
+              "{{item}}",
+          {% endfor %}],
+datasets : [
+  {
+    // Closing Price Data
+        label: "Closing Price",
+        fill: false,
+        borderColor: "#d80000",
+        backgroundColor: "#d80000",
+        radius: 3,
+        data : [
+                {% for item in values[window_size_3 - 1:] %}
+                  {{item}},
+                {% endfor %}
+              ]
+  },
+  {
+    // 20 Day Moving Average Data
+        label: "Moving Average 20d",
+        fill: false,
+        borderColor: "gold",
+        backgroundColor: "gold",
+        radius: 0,
+        data : [
+                {% for item in moving_ave_20[window_size_1 - 1:] %}
+                  {{item}},
+                {% endfor %}
+              ]
+                
+  },
+  {
+    // 40 Day Moving Average Data
+        label: "Moving Average 40d",
+        fill: false,
+        borderColor: "#0000B3",
+        backgroundColor: "#0000B3",
+        radius: 0,
+        data : [
+                {% for item in moving_ave_40[window_size_2 - 1:] %}
+                  {{item}},    
+                {% endfor %}
+              ]
+                
+  },
+  {
+    // 60 Day Moving Average Data
+        label: "Moving Average 60d",
+        fill: false,
+        borderColor: "#00B300",
+        backgroundColor: "#00B300",
+        radius: 0,
+        data : [
+                {% for item in moving_ave_60[window_size_3 - 1:] %}
+                  {{item}},
+                {% endfor %}
+              ]
+  }
+  ]
+};
+
+
+var chart_canvas = document.getElementById("chart").getContext("2d");
+
+var LineChart = new Chart(chart_canvas, {
+type: 'line',
+data: stock_data,
+options: {
+    responsive: false,
+    scales: {
+        yAxes: [{
+            ticks: {
+                // Include a dollar sign in the ticks
+                callback: function(value, index, values) {
+                    return '$' + value;
+                }
+            },
+        }]
+    }
+}
+}); 
+
+
+</script>
+</body>
+</html>
